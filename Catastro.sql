@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Zona` (
   `Nombre` VARCHAR(45) NOT NULL,
   `Concejal` VARCHAR(45) NULL,
   `Area` INT NOT NULL,
-  `NumViviendas` INT NULL AUTO_INCREMENT,
+  `NumViviendas` INT NULL,
   PRIMARY KEY (`Nombre`))
 ENGINE = InnoDB;
 
@@ -43,7 +43,6 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Vivienda` (
   `Cantidad de Personas` INT NULL,
   `NombreZona` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`Calle`, `Numero`),
-  INDEX `NombreZona_idx` (`NombreZona` ASC) VISIBLE,
   CONSTRAINT `NombreZona`
     FOREIGN KEY (`NombreZona`)
     REFERENCES `mydb`.`Zona` (`Nombre`)
@@ -63,8 +62,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Bloque` (
   `Cantidad de Personas` INT NULL,
   `nombreZona` VARCHAR(45) NULL,
   PRIMARY KEY (`Calle`, `Numero`),
-  INDEX `nombreZona_idx` (`nombreZona` ASC) VISIBLE,
-  CONSTRAINT `nombreZona`
+  CONSTRAINT `nombreZ`
     FOREIGN KEY (`nombreZona`)
     REFERENCES `mydb`.`Zona` (`Nombre`)
     ON DELETE NO ACTION
@@ -81,24 +79,22 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Persona` (
   `DNI` VARCHAR(8) NOT NULL,
   `Nombre` VARCHAR(45) NOT NULL,
   `Numero Telefono` INT NULL,
-  `DNI` VARCHAR(8) NOT NULL,
-  `CalleViv` VARCHAR(45) NULL,
+  `DNI_Lid` VARCHAR(8) NOT NULL,
+  `CalleViv` VARCHAR(40) NULL,
   `NumeroViv` INT NULL,
-  PRIMARY KEY (`DNI`),
-  INDEX `DNI_idx` (`DNI` ASC) VISIBLE,
-  INDEX `CalleViv_idx` (`CalleViv` ASC, `NumeroViv` ASC) VISIBLE,
-  CONSTRAINT `DNI`
+  PRIMARY KEY (`DNI_Lid`),
+  CONSTRAINT `DNI_`
     FOREIGN KEY (`DNI`)
-    REFERENCES `mydb`.`Persona` (`DNI`)
+    REFERENCES `mydb`.`Persona` (`DNI_Lid`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `CalleViv_`
+    FOREIGN KEY (`CalleViv`, `NumeroViv`)
+    REFERENCES `mydb`.`Vivienda` (`Calle`,`Numero`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `CalleViv`
-    FOREIGN KEY (`CalleViv` , `NumeroViv`)
-    REFERENCES `mydb`.`Vivienda` (`Calle` , `Numero`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `CalleViv`
-    FOREIGN KEY (`CalleViv`)
+    FOREIGN KEY(`CalleViv`)
     REFERENCES `mydb`.`Bloque` (`Calle`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
@@ -115,17 +111,11 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Piso` (
   `Numero` INT NOT NULL,
   `Planta` INT NOT NULL,
   `Letra` VARCHAR(1) NOT NULL,
-  `Superficie` INT NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`Calle`, `Numero`, `Planta`, `Letra`),
-  INDEX `Numero_idx` (`Numero` ASC) VISIBLE,
-  CONSTRAINT `Calle`
-    FOREIGN KEY (`Calle`)
-    REFERENCES `mydb`.`Bloque` (`Calle`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `Numero`
-    FOREIGN KEY (`Numero`)
-    REFERENCES `mydb`.`Bloque` (`Numero`)
+  `Superficie` INT NOT NULL,
+  PRIMARY KEY (`Planta`, `Letra`),
+  CONSTRAINT `Calle_`
+    FOREIGN KEY (`Calle`, `Numero`)
+    REFERENCES `mydb`.`Bloque` (`Calle`, `Numero`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

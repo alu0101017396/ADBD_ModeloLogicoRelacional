@@ -17,16 +17,12 @@ DROP SCHEMA IF EXISTS `mydb` ;
 -- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 ;
 USE `mydb` ;
-
--- -----------------------------------------------------
--- Table `mydb`.`zona`
--- -----------------------------------------------------
 DROP TABLE IF EXISTS `mydb`.`zona` ;
 
 CREATE TABLE IF NOT EXISTS `mydb`.`zona` (
   `Nombre` VARCHAR(45) NOT NULL,
   `CodZona` VARCHAR(10) NOT NULL,
-  PRIMARY KEY (`Nombre`, `CodZona`))
+  PRIMARY KEY (`CodZona`))
 ENGINE = InnoDB;
 
 
@@ -41,14 +37,16 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Productos` (
   `Tipo` VARCHAR(20) NOT NULL,
   `Precio` INT NOT NULL,
   `CodLocalizacion` VARCHAR(10) NOT NULL,
-  PRIMARY KEY (`CodigoBarras`, `Tipo`),
-  INDEX `CodLocalizacion_idx` (`CodLocalizacion` ASC) VISIBLE,
-  CONSTRAINT `CodLocalizacion`
-    FOREIGN KEY (`CodLocalizacion`)
+  `zona_CodZona` VARCHAR(10) NOT NULL,
+  PRIMARY KEY (`CodigoBarras`),
+  CONSTRAINT `fk_Productos_zona`
+    FOREIGN KEY (`zona_CodZona`)
     REFERENCES `mydb`.`zona` (`CodZona`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
+
+
 
 
 -- -----------------------------------------------------
@@ -59,13 +57,13 @@ DROP TABLE IF EXISTS `mydb`.`Pedido` ;
 CREATE TABLE IF NOT EXISTS `mydb`.`Pedido` (
   `FechaPedido` DATE NOT NULL,
   `CodigoPedido` VARCHAR(45) NOT NULL,
-  `Precio` INT NULL AUTO_INCREMENT,
+  `Precio` INT NULL,
   `Tipo` VARCHAR(20) NULL,
+  `CodBarras` Varchar(45) NOT NULL,
   PRIMARY KEY (`CodigoPedido`),
-  INDEX `Tipo_idx` (`Tipo` ASC) VISIBLE,
-  CONSTRAINT `Tipo`
-    FOREIGN KEY (`Tipo`)
-    REFERENCES `mydb`.`Productos` (`Tipo`)
+  CONSTRAINT `TipoCons`
+    FOREIGN KEY (`CodBarras`)
+    REFERENCES `mydb`.`Productos` (`CodigoBarras`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -81,11 +79,10 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Cliente` (
   `Nombre` VARCHAR(45) NOT NULL,
   `DNI` VARCHAR(9) NOT NULL,
   `FechaNacimiento` DATE NOT NULL,
-  `VolumenCompra` INT NULL AUTO_INCREMENT,
+  `VolumenCompra` INT NULL ,
   `CodigoPedido` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`Código de fidelizacion`),
-  INDEX `CodigoPedido_idx` (`CodigoPedido` ASC) VISIBLE,
-  CONSTRAINT `CodigoPedido`
+  CONSTRAINT `CodigoPed`
     FOREIGN KEY (`CodigoPedido`)
     REFERENCES `mydb`.`Pedido` (`CodigoPedido`)
     ON DELETE NO ACTION
@@ -101,12 +98,11 @@ DROP TABLE IF EXISTS `mydb`.`Vivero` ;
 CREATE TABLE IF NOT EXISTS `mydb`.`Vivero` (
   `Nombre` VARCHAR(30) NOT NULL,
   `AforoMaximo` INT NULL,
-  `Localizacion` VARCHAR(45) NOT NULL,
+  `Localizacion` VARCHAR(10) NOT NULL,
   PRIMARY KEY (`Nombre`),
-  INDEX `Localizacion_idx` (`Localizacion` ASC) VISIBLE,
-  CONSTRAINT `Localizacion`
+  CONSTRAINT `Loc`
     FOREIGN KEY (`Localizacion`)
-    REFERENCES `mydb`.`zona` (`Nombre`)
+    REFERENCES `mydb`.`zona` (`CodZona`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -123,17 +119,15 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Empleado` (
   `Nombre` VARCHAR(45) NOT NULL,
   `NSS` INT NOT NULL,
   `Cargo` VARCHAR(20) NULL,
-  `NombreZonaTrabajo` VARCHAR(45) NOT NULL,
+  `NombreZonaTrabajo` VARCHAR(10) NOT NULL,
   `CodigoPedidoEncargado` VARCHAR(45) NULL,
   PRIMARY KEY (`DNI`, `NSS`, `Nombre`),
-  INDEX `NombreZonaTrabajo_idx` (`NombreZonaTrabajo` ASC) VISIBLE,
-  INDEX `CodigoPedidoEncargado_idx` (`CodigoPedidoEncargado` ASC) VISIBLE,
-  CONSTRAINT `NombreZonaTrabajo`
+  CONSTRAINT `NombreZonaT`
     FOREIGN KEY (`NombreZonaTrabajo`)
-    REFERENCES `mydb`.`zona` (`Nombre`)
+    REFERENCES `mydb`.`zona` (`CodZona`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `CodigoPedidoEncargado`
+  CONSTRAINT `CodigoPedidoEnc`
     FOREIGN KEY (`CodigoPedidoEncargado`)
     REFERENCES `mydb`.`Pedido` (`CodigoPedido`)
     ON DELETE NO ACTION
